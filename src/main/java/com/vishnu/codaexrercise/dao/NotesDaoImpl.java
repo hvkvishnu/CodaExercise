@@ -59,4 +59,9 @@ public class NotesDaoImpl extends AbstractDao<Notes> {
     protected PreparedStatement getGetAllStatement() {
         return getAllStatement;
     }
+
+    @Override
+    protected PreparedStatement getUpdateStatement(int id, Notes notes) throws SQLException {
+        return null;
+    }
 }

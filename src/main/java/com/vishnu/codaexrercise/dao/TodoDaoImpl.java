@@ -13,14 +13,24 @@ import java.sql.Statement;
 public class TodoDaoImpl extends AbstractDao<ToDo> {
     private PreparedStatement saveStatement;
     private PreparedStatement getAllStatement;
+    private PreparedStatement updateStatement;
 
 
     @Autowired
     public TodoDaoImpl() {
         createSaveStatement();
         createGetAllStatement();
+        createUpdateStatement();
     }
 
+    private void createUpdateStatement() {
+        try {
+            updateStatement = connection.prepareStatement("update todo SET description=? where todo_id=? ");
+        }catch (SQLException e){
+            throw new RuntimeException("can not create update statement ",e);
+
+        }
+    }
 
 
     private void createSaveStatement() {
@@ -58,5 +68,12 @@ public class TodoDaoImpl extends AbstractDao<ToDo> {
     @Override
     protected PreparedStatement getGetAllStatement() {
         return getAllStatement;
+    }
+
+    @Override
+    protected PreparedStatement getUpdateStatement(int id, ToDo toDo) throws SQLException {
+        updateStatement.setString(1,toDo.getDescription());
+        updateStatement.setInt(2,id);
+        return updateStatement;
     }
 }

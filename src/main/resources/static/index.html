@@ -44,9 +44,7 @@
             </select>
         <!-- </div> -->
     </div>
-    <div class="container">
-        <div class="row">
-        <div id="add" class="col-lg-6">
+    <div style="margin-top: 2em;" class="container">
         
         <form class="form-inline" id="add-form-todo">
             <div class="input-group">
@@ -67,30 +65,9 @@
         </form>
     </div>
 
-    <div id="edit" class="col-lg-6">
-        <input type="text" id="id" placeholder="Enter your id">
-        <br>
-        <br>
-        <form class="form-inline" id="edit-form-todo">
-            <div class="input-group">
-                <input type="text" id="todo-description" class="form-control" size="50" placeholder="" required>
-                <div class="input-group-btn">
-                    <button type="button" class="btn btn-danger" onclick="EditTodo()" >Submit</button>
-                </div>
-            </div>
-        </form>
 
-        <form class="form-inline" id="edit-form-note" style="display: none;">
-            <div class="input-group">
-                <textarea class="form-control" form="add-form-note" id="note-description"></textarea>
-                <div class="input-group-btn">
-                    <button type="button" class="btn btn-danger" onclick="editNotes()" >Submit</button>
-                </div>
-            </div>
-        </form>
-    </div>
-    </div>
-</div>
+    
+
 
 
         <div class="container" style="padding-top: 5em;">
@@ -101,6 +78,8 @@
                         <tr>
                             <th>Id</th>
                             <th>description</th>
+                            <th>Edit</th>
+
                         </tr>
                     </table>
                 </div>
@@ -109,7 +88,7 @@
                     <table id="Notes-table">
                         <tr>
                             <th>Id</th>
-                            <th>description</th>
+                            <th>Description</th>
                         </tr>
                     </table>
                 </div>
@@ -124,9 +103,12 @@
         let dropdown = document.getElementById("dropdown").value;
         let inputTodo = document.getElementById("add-form-todo");
         let inputNote = document.getElementById("add-form-note");
+        let editTodo = document.getElementById("edit-form-todo");
+        let editNote = document.getElementById("edit-form-note");
         if(dropdown == "todo"){
             inputTodo.style.display="block";
             inputNote.style.display="none";
+            editTodo.style.display=""
         }
         else{
             inputTodo.style.display="none";
@@ -147,11 +129,19 @@
 
     }
 
+    function validateInput(element){
+        if(element == ''){
+            window.alert("Provide Input");
+            return false;
+        }
+            return true;
+    }
 
     async function createTodo(){
         console.log("Inside createTodo");
-        
         let description = document.getElementById("todo-description").value;
+        if(!validateInput(description))
+            return false;
         let createRequest = {"description":description};
         const response = await fetch("http://localhost:8080/todo",{
             method:'POST',
@@ -161,7 +151,7 @@
             body:JSON.stringify(createRequest)
         })
         .then(response => response.json())
-        .then(result => addDetails("Todo",result));
+        .then(result => console.log(result));
         
         // if (response.ok) { 
         //    const objects = await response.json();
@@ -175,6 +165,8 @@
     async function createNotes(){
         console.log("Inside createNotes");
         let description = document.getElementById("note-description").value;
+        if(!validateInput(description))
+            return false;
         let createRequest = {"description":description};
         let objects;
         const response = await fetch("http://localhost:8080/notes",{
@@ -194,15 +186,39 @@
         // addDetails("Notes",objects);
     }
 
+    async function updateTodo(element){
+        let id = parseInt(element);
+        var updatedDescription = prompt("Enter new Todo");
+        if(updatedDescription == ''){
+            alert("Please enter value to update");
+            return;
+        }
+        let createRequest = {"id":id,"description":updatedDescription};
+        let objects;
+        const response = await fetch("http://localhost:8080/todo/edit",{
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify(createRequest)
+        });
+        location.reload();
+        
+    }
+
     async function addDetails(component,object){
         console.log("from add"+object);
         let table = document.getElementById(component+"-table");
         let row = table.insertRow();
         let cell1 = row.insertCell(0);
         let cell2 = row.insertCell(1);
+        let cell3 = row.insertCell(2);
         cell1.innerHTML = object.id;
         cell2.innerHTML = object.description;
-        
+        if(component == 'Todo'){
+            let temp = object.id;
+            cell3.innerHTML = "<button id='id_"+temp+"' onclick=updateTodo('"+temp+"')>change</button>";
+        }
     }
 
     function renderObject(objects,component){

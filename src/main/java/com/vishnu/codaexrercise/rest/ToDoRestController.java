@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/todo")
+@RequestMapping(value = {"/todo"})
 public class ToDoRestController {
    private ToDoService toDoService;
 
@@ -22,7 +22,11 @@ public class ToDoRestController {
     public SavedResource saveToDo(@RequestBody ToDo toDo){
         return new SavedResource(toDoService.saveToDo(toDo));
     }
-
+    @PostMapping(path="/edit",consumes = "application/json")
+    @CrossOrigin
+    public void updateTodo(@RequestBody ToDo todo){
+       toDoService.updateToDo(todo.getId(),todo);
+    }
     @GetMapping
     @CrossOrigin
     public List<ToDo> getAllCourses(){

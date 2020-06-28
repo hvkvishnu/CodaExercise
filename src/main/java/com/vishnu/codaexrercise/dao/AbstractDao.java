@@ -1,5 +1,6 @@
 package com.vishnu.codaexrercise.dao;
 
+import com.vishnu.codaexrercise.entity.ToDo;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 
 import javax.swing.text.html.parser.Entity;
@@ -56,4 +57,23 @@ public abstract PreparedStatement getSaveStatement(T t) throws SQLException;
     protected abstract T getEntity(ResultSet resultSet) throws SQLException;
 
     protected abstract PreparedStatement getGetAllStatement();
+
+    @Override
+    public  void update(int id,T t){
+        try {
+
+
+            //set the id for the select query here 1 is the parameterIndex
+            PreparedStatement updateStatement = getUpdateStatement(id,t);
+            if(updateStatement.executeUpdate() != 1){
+                throw new RuntimeException("can not update entity");
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("can not  update with id of " + id, e);
+        }
+
+    }
+
+    protected abstract PreparedStatement getUpdateStatement(int id, T t) throws SQLException;
 }

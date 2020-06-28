@@ -22,4 +22,8 @@ public class ToDoService {
     }
 
     public List<ToDo> getAllTodo() { return todoDao.getAll();}
+
+    public void updateToDo(int id,ToDo todo) {
+         todoDao.update(id,todo);
+    }
 }
